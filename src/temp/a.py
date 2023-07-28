@@ -1,6 +1,6 @@
 import pygame
 import random
-
+import sys
 colors = [
     (0, 0, 0),
     (120, 37, 179),
@@ -227,3 +227,4 @@ while not done:
     clock.tick(fps)
 
 pygame.quit()
+sys.exit()
