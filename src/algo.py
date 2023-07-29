@@ -1,86 +1,103 @@
-# algorithm of the game with expectiminimax
 import random
 import copy
+import numpy as np
+# greedy 
+def best_move(game, pos_figures): # pos_figures = [(figure, pos), (figure, pos), (figure, pos)]
+    # game_temp = copy.deepcopy(game)
+    best_score = -1
+    bet_move = pos_figures[0]
+    game_temp = game
+    for i, pos_figure in enumerate(pos_figures):
+        score = score_field(temp_freeze(game_temp, pos_figure[1]))
+        # update the score of the figure
+        pos_figures[i][2] = score
+        if score > best_score:
+            best_score = score
+            bet_move = pos_figure
+    # return pos_figures[np.argmax(pos_figures[:, 2])]
+    return bet_move
 
-def expectiminimax(game, depth, maximizing_player):
-    if depth == 0 or game.state == "gameover":
-        return evaluate_state(game)
+# return a score of the field
+def score_field(field):
+    lines = 0
+    for i in range(len(field)):
+        if 0 not in field[i]:
+            lines += 1
+            field[i] = [0] * len(field[i])
 
-    if maximizing_player:
-        max_eval = float('-inf')
-        for i in range(len(game.figures)):
-            if game.figures[i] is not None:
-                for move in all_posibilities_place(game, i):
-                    temp_field = temp_freeze(game, game.figures[i], move[1], move[2])
-                    game.figures[i].x, game.figures[i].y = move[1], move[2]
-                    game.figures[i].rotation = move[0]
-                    eval = expectiminimax(game, depth - 1, False)
-                    max_eval = max(max_eval, eval)
-                    # game.field = temp_field  # Undo the move
-        return max_eval
-    else:
-        chance_nodes = 0
-        sum_eval = 0
-        for i in range(len(game.figures)):
-            if game.figures[i] is not None:
-                for move in all_posibilities_place(game, i):
-                    temp_field = temp_freeze(game, game.figures[i], move[1], move[2])
-                    game.figures[i].x, game.figures[i].y = move[1], move[2]
-                    game.figures[i].rotation = move[0]
-                    eval = expectiminimax(game, depth - 1, True)
-                    chance_nodes += 1
-                    sum_eval += eval
-                    # game.field = temp_field  # Undo the move
-        return sum_eval / chance_nodes if chance_nodes != 0 else 0
+    score = lines ** 2
+    return score
 
-def best_move(game):
-    game_temp = copy.deepcopy(game)
-    best_score = float('-inf')
-    best_move = None
-    for i in range(len(game_temp.figures)):
-        if game_temp.figures[i] is not None:
-            for move in all_posibilities_place(game_temp, i):
-                print ("len = " + str(len(all_posibilities_place(game_temp, i))))
-                temp_field = temp_freeze(game_temp, game_temp.figures[i], move[1], move[2])
-                game_temp.figures[i].x, game_temp.figures[i].y = move[1], move[2]
-                game_temp.figures[i].rotation = move[0]
-                eval = expectiminimax(game_temp, 2, False)
-                # game_temp.field = temp_field  # Undo the move
-
-                if eval > best_score:
-                    best_score = eval
-                    best_move = move
-
-    return best_move
-
-def evaluate_state(game):
-    # Define your heuristic evaluation function here (same as before)
-    return game.score + len(game.empty_place())
-
-def all_posibilities_place(game, idx):
-    empty_place = game.empty_place()
-    all_posibilities_place = []
-    if game.figures[idx] is not None:
-        for j in range(len(empty_place)):
-            for k in range(len(game.figures[idx].all_figures[game.figures[idx].type])):
-                game.figures[idx].rotation = k
-                game.figures[idx].x = empty_place[j][0]
-                game.figures[idx].y = empty_place[j][1]
-                if game.can_be_freeze():
-                    all_posibilities_place.append([k, empty_place[j][0], empty_place[j][1]])
-    return all_posibilities_place
-
-def temp_freeze(game, figure, x, y):
-    temp_field = game.field
-    # print("u temp_field = " + str(game.field))
+def temp_freeze(game, figure):
+    temp_field = copy.deepcopy(game.field)
     for i in range(4):
         for j in range(4):
             if i * 4 + j in figure.image():
                 try:
-                    if temp_field[i + y][j + x] != 0:
+                    if temp_field[i + figure.y][j + figure.x] != 0:
                         return None
                     else:
-                        temp_field[i + y][j + x] = figure.color
+                        temp_field[i + figure.y][j + figure.x] = figure.type + 1
                 except IndexError:
                     return None
     return temp_field
+
+
+
+# for pos_figure in pos_figures:
+#         temp_field = temp_freeze(game_temp, pos_figure[1])
+#         # pos_figure[0].x, pos_figure[0].y = pos_figure[1].x, pos_figure[1].y
+#         # pos_figure[0].rotation = pos_figure[1].rotation
+#         game_temp.field = temp_field # Undo the move
+#         eval = expectiminimax(game_temp, 2, False)
+#         if eval > best_score:
+#             best_score = eval
+#             best_move = pos_figure
+#     return best_move
+
+# def expectiminimax(game, depth, is_chance):
+#     if game.field is None:
+#         print("game field is None")
+#         return 0
+#     if depth == 0:
+#         # print("game field: " + str(game.field))
+#         return game.score_field(game.field)
+
+#     if is_chance:
+#         total_score = 0
+#         total_possibilities = 0
+#         pos_figures = game.all_posibilities_place()
+
+#         for pos_figure in pos_figures:
+#             temp_field = temp_freeze(game, pos_figure[1])
+#             # pos_figure[0].x, pos_figure[0].y = pos_figure[1].x, pos_figure[1].y
+#             # pos_figure[0].rotation = pos_figure[1].rotation
+#             # game.field = temp_field
+
+#             # if game.can_place_figure(pos_figure[0]):
+#             if temp_field is not None:
+#                 game.field = temp_field
+#                 total_possibilities += 1
+#                 total_score += expectiminimax(game, depth - 1, False)
+
+#         return total_score / (1 if total_possibilities == 0 else total_possibilities)
+
+#     else:
+#         min_score = float('inf')
+#         pos_figures = game.all_posibilities_place()
+
+#         for pos_figure in pos_figures:
+#             temp_field = temp_freeze(game, pos_figure[1])
+#             # pos_figure[0].x, pos_figure[0].y = pos_figure[1].x, pos_figure[1].y
+#             # pos_figure[0].rotation = pos_figure[1].rotation
+#             if temp_field is not None:
+#                 game.field = temp_field
+
+#                 # if game.can_place_figure(pos_figure[0]):
+#                 # game.freeze()
+#                 score = expectiminimax(game, depth - 1, True)
+
+#                 if score < min_score:
+#                     min_score = score
+
+#         return min_score

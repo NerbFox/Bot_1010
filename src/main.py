@@ -156,10 +156,18 @@ while not done:
     font = pygame.font.SysFont('Calibri', 25, True, False)
     font1 = pygame.font.SysFont('Calibri', 65, True, False)
     text = font.render("Score: " + str(game.score), True, WHITE)
+    text_bot =   font.render("---Bot Activated---", True, WHITE)
+    text_human = font.render("Human is playing...", True, WHITE)
     text_game_over = font1.render("Game Over", True, (255, 125, 0))
     text_game_over1 = font1.render("Press ESC", True, (255, 215, 0))
 
-    screen.blit(text, [0, 0])
+    screen.blit(text, [2, 0])
+    # center and on the bottom
+    arrText = [2, 470]
+    if Bot:
+        screen.blit(text_bot, arrText)
+    else:
+        screen.blit(text_human, arrText)
     if game.state == "gameover":
         screen.blit(text_game_over, [20, 200])
         screen.blit(text_game_over1, [25, 265])

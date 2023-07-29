@@ -48,3 +48,15 @@ class Figure:
         self.rotation = (self.rotation + 1) % len(self.all_figures[self.type])
         print("-self type: " + str(self.type))
         print("-self rotation: " + str(self.rotation))
+    
+    def get_number_type(self):
+        return len(self.all_figures)
+
+    def get_number_rotation(self):
+        return len(self.all_figures[self.type])
+    
+    def change_type(self, type):
+        self.type = type
+        
+    def change_rotation(self, rotation):
+        self.rotation = rotation

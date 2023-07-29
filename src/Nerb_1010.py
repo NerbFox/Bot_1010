@@ -1,6 +1,22 @@
 from Figure import *
 import copy
 from algo import *
+import numpy as np
+minimum_value = 0
+
+# all_posibilities_figure is all figure type and rotation
+all_posibilities_figure = []
+figure_temp = Figure(0, 0)
+number_type = figure_temp.get_number_type()
+for i in range(number_type):
+    figure_temp.type = i
+    number_rotation = figure_temp.get_number_rotation()
+    for j in range(number_rotation):
+        figure_temp.rotation = j
+        all_posibilities_figure.append(copy.deepcopy(figure_temp))
+# print("len(all_posibilities_figure) = " + str(len(all_posibilities_figure)))
+# for figure in all_posibilities_figure:
+#     print("figure.type = " + str(figure.type) + ", figure.rotation = " + str(figure.rotation))
 
 class Nerb_1010:
     def __init__(self, height, width):
@@ -126,7 +142,14 @@ class Nerb_1010:
         b, pos_figures = self.is_there_a_place()
         if b :
             print("b---")
-            i, fig = copy.deepcopy(pos_figures[0])
+            i, fig, _= best_move(self, pos_figures)
+            # i, fig, _= best_move(self, pos_figures, all_posibilities_figure)
+            # for i in range(len(pos_figures)):
+            #     print("pos_figures[{}] = {}".format(i, pos_figures[i]))
+            # print all pos figure that in first tuple of element is 0
+            
+            # print("pos_figures[0] = " + str(pos_figures[0]))
+            # i, fig, _ = copy.deepcopy(pos_figures[0])
             self.figure = fig
             self.freeze()
             self.figures[i] = None
@@ -155,7 +178,6 @@ class Nerb_1010:
         #     self.new_figure()
         #     print("new figure")
         
-    
     # return empty place in the field
     def empty_place(self): 
         empty_place = [] 
@@ -165,22 +187,6 @@ class Nerb_1010:
                     empty_place.append([j-1, i-1])
         # print("empty_place = " + str(empty_place))
         return empty_place
-    
-    # return a score of the field
-    def score_field(self, field):
-        score = 0
-        lines = 0 
-        for i in range(self.height):
-            zeros = 0
-            for j in range(self.width):
-                if field[i][j] == 0:
-                    zeros += 1
-            if zeros == 0: # if the line is full
-                lines += 1
-                for ji in range(self.width):
-                    field[i][ji] = 0
-        score += lines ** 2
-        return score
     
     def can_place_figure(self, figure):
         for i in range(4):
@@ -200,8 +206,12 @@ class Nerb_1010:
 
     def all_posibilities_place(self):
         empty_place = self.empty_place()
-        print("len(empty_place) = " + str(len(empty_place)) )
-        all_posibilities_place = []
+        # print("len(empty_place) = " + str(len(empty_place)) )
+        # all_posibilities_place = []
+        # array of array of [figure_idx, figure, score] 2 dimension
+        all_posibilities_place = np.array([[0, Figure(0, 0), 0]])
+        # # erase the first element
+        all_posibilities_place = np.delete(all_posibilities_place, 0, 0)
         for i in range(len(self.figures)):
             if self.figures[i] is not None:  # if the figure is not None
                 figure_copy = copy.deepcopy(self.figures[i])
@@ -212,15 +222,13 @@ class Nerb_1010:
                         figure_copy.x = empty_place[j][0]
                         figure_copy.y = empty_place[j][1]
                         if self.can_place_figure(figure_copy):
-                            all_posibilities_place.append([i, copy.deepcopy(figure_copy)])
-                        # else:
-                        #     print("figure {} can not be placed at x = {} and y = {} with rotation = {}".format(i, figure_copy.x, figure_copy.y, figure_copy.rotation))
+                            # all_posibilities_place.append([i, copy.deepcopy(figure_copy), 0])
+                            all_posibilities_place = np.append(all_posibilities_place, np.array([[i, copy.deepcopy(figure_copy), minimum_value]]), axis=0)
         return all_posibilities_place
 
     def is_there_a_place(self):
         all_place = self.all_posibilities_place()
-        print("len(all_place) = " + str(len(all_place)) )
-        if all_place:
+        if len(all_place) != 0:
             return True, all_place
         else:
             return False, all_place
