@@ -1,0 +1,5 @@
+# success_sound = "../sounds/success-1.mp3"
+success_sound = "../sounds/success_bell.mp3"
+start_sound = "../sounds/game-start.mp3"
+game_over_sound = "../sounds/game-over.mp3"
+background_sound = "../sounds/reflected-light.mp3"

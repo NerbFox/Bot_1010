@@ -1,6 +1,10 @@
 from pygame_vars import *
+from Nerb_1010 import *
 from algo import *
 import sys
+
+game = Nerb_1010(game_height, game_width)
+
 # Loop until the user clicks the close button or 'q' is pressed
 while not done:
     # if game.figure is not None:
@@ -9,7 +13,7 @@ while not done:
     if Bot:
         # user cannot play the game with keyboard
         game.ai_move() 
-        pygame.time.wait(100)  
+        pygame.time.wait(50)  
     # print("counter: " + str(counter))
     if game.figures == []:
         a = game.new_figure()
@@ -113,7 +117,7 @@ while not done:
             x2 = 340
             x = 93
             if 300 < pos[1] and pos[1] < 350 :
-                print("y_fig")
+                # print("y_fig")
                 if x1 < pos[0] and pos[0] < x1 + x:
                     fig = 0
                 elif x1 + x < pos[0] and pos[0] < x1 + 2 * x:
@@ -121,7 +125,7 @@ while not done:
                 elif x1 + 2 * x < pos[0] and pos[0] < x1 + 3 * x:
                     fig = 2
             if fig != -1:
-                print("fig = " + str(fig))
+                # print("fig = " + str(fig))
                 game.figure_clicked(fig)
             
             # game.figure_clicked(0)

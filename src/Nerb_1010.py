@@ -1,7 +1,11 @@
 from Figure import *
+from pygame_vars import *
 import copy
 from algo import *
 import numpy as np
+import pygame
+from constants import * 
+# import os
 minimum_value = 0
 
 # all_posibilities_figure is all figure type and rotation
@@ -43,12 +47,31 @@ class Nerb_1010:
             for j in range(width):
                 new_line.append(0)
             self.field.append(new_line)
+            
+        self.total_types_figure = [0 for i in range(number_type)]
+        self.play_sound(start_sound)
+        self.play_sound_channel(background_sound, 0.2, -1, channel2)
 
+    def play_sound(self, file_sound, volume=0.7, loop=1):
+        pygame.mixer.music.load(file_sound)
+        pygame.mixer.music.set_volume(volume)
+        pygame.mixer.music.play(loop, 0.0, 0)
+    
+    def play_sound_channel(self, file_sound, volume=0.7, loop=1, channel=channel1):
+        # play sound on channel 1 by default
+        sound = pygame.mixer.Sound(file_sound)
+        channel.play(sound, loop)
+        channel.set_volume(volume)
+    
     def new_figure(self):
         # add three figures
         self.figures = [Figure(fig1_x, y_fig), Figure(fig2_x, y_fig), Figure(fig3_x, y_fig)]
         self.figure = self.figures[0]
         self.param = 0
+        # update the total types figure
+        for i in range(len(self.figures)):
+            self.total_types_figure[self.figures[i].type] += 1
+        # print("self.total_types_figure = " + str(self.total_types_figure))
 
     def figure_clicked(self, param):
         self.figure = self.figures[param]
@@ -86,7 +109,9 @@ class Nerb_1010:
                 if self.field[i][j] == 0:
                     zeros += 1
             if zeros == 0: # if the line is full
-                print("---------line is full-----------")
+                # print("---------line is full-----------")
+                # play a sound
+                self.play_sound(success_sound)
                 lines += 1
                 # fill the line with black color
                 for ji in range(self.width):
@@ -111,6 +136,8 @@ class Nerb_1010:
         self.break_lines()
         if self.intersects():
             self.state = "gameover"
+        if self.state == "gameover":
+            self.play_sound(game_over_sound)
             
     def can_be_freeze(self):       
         temp_field = copy.deepcopy(self.field)
@@ -141,9 +168,9 @@ class Nerb_1010:
         # print("ai_move")
         b, pos_figures = self.is_there_a_place()
         if b :
-            print("b---")
-            i, fig, _= best_move(self, pos_figures)
-            # i, fig, _= best_move(self, pos_figures, all_posibilities_figure)
+            print("--bot moves--")
+            # i, fig, _= best_move(self, pos_figures)
+            i, fig, _= best_move(self, pos_figures, all_posibilities_figure, self.total_types_figure)
             # for i in range(len(pos_figures)):
             #     print("pos_figures[{}] = {}".format(i, pos_figures[i]))
             # print all pos figure that in first tuple of element is 0
@@ -153,11 +180,11 @@ class Nerb_1010:
             self.figure = fig
             self.freeze()
             self.figures[i] = None
-            print("i = " + str(i))
-            print("x, y = " + str(self.figure.x) + ", " + str(self.figure.y))
+            # print("i = " + str(i))
+            # print("x, y = " + str(self.figure.x) + ", " + str(self.figure.y))
             if self.figures[0] == None and self.figures[1] == None and self.figures[2] == None:
                 self.new_figure()
-                print("new figure")
+                # print("new figure")
         
         # move = best_move(self)
         # if move == None:

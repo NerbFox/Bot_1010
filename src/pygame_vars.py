@@ -1,5 +1,4 @@
 import pygame
-from Nerb_1010 import *
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -12,7 +11,6 @@ game_height = 10
 game_width = 10
 done = False
 fps = 25
-game = Nerb_1010(game_height, game_width)
 counter = 0
 up = False
 down = False
@@ -30,3 +28,6 @@ pygame.init()
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Nerb 1010! Game")
+
+channel1 = pygame.mixer.Channel(0)
+channel2 = pygame.mixer.Channel(1)
