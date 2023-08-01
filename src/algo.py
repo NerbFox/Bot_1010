@@ -2,7 +2,7 @@ import random
 import copy
 import numpy as np
 
-
+# predict_next_types function is used to predict the next types of the figures
 def predict_next_types(total_types_figure, num_predictions=3):
     # Calculate the total number of types and their frequencies
     total_types = len(total_types_figure)
@@ -24,18 +24,15 @@ def predict_next_types(total_types_figure, num_predictions=3):
 
     return next_types
 
-# greedy 
+# greedy with heuristic
 def best_move(game, pos_figures, all_posibilities_figure, total_types_figure):
     # calculate the probability of getting each figure in the next 10 moves from the current position
-    all_p = []
-    next_figures = predict_next_types(total_types_figure, num_predictions=3)
-    for i in range(len(all_posibilities_figure)):
-        for j in range(len(next_figures)):
-            if all_posibilities_figure[i].type == next_figures[j]:
-                all_p.append(all_posibilities_figure[i])
-    # print("all_p = " + str(all_p))
-    # pos_figures = [(figure, pos), (figure, pos), (figure, pos)]
-    # game_temp = copy.deepcopy(game)
+    # all_p = []
+    # next_figures = predict_next_types(total_types_figure, num_predictions=3)
+    # for i in range(len(all_posibilities_figure)):
+    #     for j in range(len(next_figures)):
+    #         if all_posibilities_figure[i].type == next_figures[j]:
+    #             all_p.append(all_posibilities_figure[i])
     best_score = -1
     best_move = pos_figures[0]
     game_temp = game
@@ -52,6 +49,8 @@ def best_move(game, pos_figures, all_posibilities_figure, total_types_figure):
     # return pos_figures[np.argmax(pos_figures[:, 2])]
     return best_move
 
+# score_all_pos function is used to score all the possible positions of the figure
+# but it consumes a lot of time and memory so it is not used
 def score_all_pos(all_p, game_temp):
     game = copy.deepcopy(game_temp)
     temp_fielddd = copy.deepcopy(game.field)
@@ -74,8 +73,7 @@ def score_all_pos(all_p, game_temp):
             score = 0
         best_score = max(score, best_score)
     return best_score
-
-
+  
 # try to change the figure in figures
 # cek ketersebaran zero in a row, sum it 
 # ----0-0000
@@ -88,21 +86,12 @@ def score_all_pos(all_p, game_temp):
 # ---------0
 # 0000000000
 
-# each row 
-# zero = 0
-# if x(1) == 0:
-#     sumOfGroupZero += 1
-#     zero += 1
+# Heuristic approach
+# 1. the number of lines that can be formed (the more lines, the better)
+# 2. the minimum number of zeroes in a row (the minimum zero in a row, the better)
+# 3. the number of groups of zeroes in each row (the minimum number of groups, the better)
 
-# for i in range(1, len(x)):
-#     if xi == 0 :
-#         zero += 1
-#         if x(i-1) != 0:
-#             sumOfGroupZero += 1
-# if zero == 0:
-#     lines += 1
-
-# return a score of the field
+# score_field function is used to score the field
 def score_field(field):
     lines = 0
     cols = len(field)
@@ -110,7 +99,7 @@ def score_field(field):
     min_zeroes = cols
     sum_of_group_zeroes = 0
     for i in range(rows):
-        # count the number of zeroes in each row
+        # count the number of zeroes, and the number of groups of zeroes in a row
         zeroes = 0
         if field[i][0] == 0:
             sum_of_group_zeroes += 1
@@ -121,6 +110,7 @@ def score_field(field):
                 if field[i][j - 1] != 0:
                     sum_of_group_zeroes += 1
         min_zeroes = min(min_zeroes, zeroes)
+        # if the line is full or there are no zeroes in the line, increment the lines
         if zeroes == 0:
             lines += 1
             
@@ -139,7 +129,7 @@ def score_field(field):
     return score
 
 def temp_freeze(field, figure):  # change to field
-    temp_field = copy.deepcopy(field)  # important
+    temp_field = copy.deepcopy(field)  # important to use deepcopy
     for i in range(4):
         for j in range(4):
             if i * 4 + j in figure.image():
