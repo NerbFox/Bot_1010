@@ -27,7 +27,7 @@ NIM     : 13521043
 List the ready features here:
 - The bot can play the game automatically using a greedy algorithm.
 - The game can be played manually by the user.
-- The game has several souds to make the game more enjoyable. 
+- The game has several sounds to make the game more enjoyable. 
 
 ## Screenshots
 ![Example screenshot](./src/img/1.png)
